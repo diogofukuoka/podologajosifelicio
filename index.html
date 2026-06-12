@@ -134,6 +134,7 @@
     /* Localizacao Section */
     .map-container { width: 100%; aspect-ratio: 4/3; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; overflow: hidden; position: relative; }
     @media (min-width: 768px) { .map-container { aspect-ratio: 21/9; } }
+    .map-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
     /* Footer */
     .footer { padding: 48px 0; border-top: 1px solid rgba(255,255,255,0.05); background-color: #050505; }
@@ -349,8 +350,6 @@
         <div class="map-container">
           <iframe
             src="https://maps.google.com/maps?q=Rua%20Jo%C3%A3o%20Reffo%2C%201676%20-%20Santa%20Felicidade%2C%20Curitiba%20-%20PR%2C%2082410-000&t=&z=15&ie=UTF8&iwloc=&output=embed"
-            class="absolute inset-0 w-full h-full"
-            style="border: 0;"
             allowfullscreen=""
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
