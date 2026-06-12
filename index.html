@@ -1,14 +1,539 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Forcing Github Pages Rebuild -->
-    <title>Podologa Josi</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Podóloga Josi</title>
+  <style>
+    /* Reset & Base */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: #050505;
+      color: #ffffff;
+      overflow-x: hidden;
+      font-family: "Helvetica Neue", "Arial", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background-color: rgba(197, 160, 89, 0.3); color: #ffffff; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #050505; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+
+    /* Variables for Colors & Fonts */
+    :root {
+      --gold-400: #C5A059;
+      --gold-500: #a9884a;
+      --font-display: "Georgia", serif;
+    }
+
+    /* Common Utilities */
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+    .text-gold { color: var(--gold-400); }
+    .bg-gold { background-color: var(--gold-400); }
+    .bg-gold:hover { background-color: var(--gold-500); }
+    .font-display { font-family: var(--font-display); }
+    .uppercase { text-transform: uppercase; }
+    .italic { font-style: italic; }
+    
+    /* Header */
+    .header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.05); background-color: rgba(5,5,5,0.8); backdrop-filter: blur(4px); }
+    .header .container { height: 96px; display: flex; align-items: center; justify-content: space-between; }
+    .header-logo { font-size: 20px; letter-spacing: 2px; display: flex; align-items: center; gap: 8px; font-weight: normal; }
+    .header-nav { display: none; align-items: center; gap: 32px; }
+    .header-nav button { background: none; border: none; font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.7); cursor: pointer; transition: color 0.3s; text-transform: uppercase; }
+    .header-nav button:hover { color: var(--gold-400); }
+    .header-btn { border: 1px solid var(--gold-400); border-radius: 9999px; padding: 8px 20px; font-size: 12px; letter-spacing: 1px; color: #fff; text-decoration: none; transition: 0.3s; background: rgba(255,255,255,0.05); text-transform: uppercase; }
+    .header-btn:hover { background: var(--gold-400); color: #000; }
+    @media (min-width: 768px) { .header-nav { display: flex; } }
+
+    /* Hero */
+    .hero { min-height: 100vh; display: flex; align-items: center; overflow: hidden; padding-top: 80px; position: relative; }
+    .hero-bg { background-image: url('https://images.unsplash.com/photo-1519415943484-9fa1873496d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'); background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0.4; z-index: 0; width: 100%; height: 120%; position: absolute; top: 0; left: 0; transform: translateY(0); transition: transform 0.1s linear; }
+    .hero-overlay-1 { position: absolute; inset: 0; background-color: rgba(5,5,5,0.4); z-index: 10; pointer-events: none; filter: blur(24px); opacity: 0.5; }
+    .hero-overlay-2 { position: absolute; inset: 0; background: linear-gradient(to right, #050505, rgba(5,5,5,0.7), rgba(5,5,5,0.2)); z-index: 10; pointer-events: none; }
+    .hero-content { z-index: 20; width: 100%; margin-top: 64px; display: flex; flex-direction: column; justify-content: center; position: relative; }
+    .hero-inner { max-width: 672px; width: 100%; }
+    .hero-tag { font-size: 10px; letter-spacing: 2px; font-weight: 600; text-transform: uppercase; color: var(--gold-400); display: block; margin-bottom: 16px; }
+    .hero-title { font-size: 50px; font-weight: 300; line-height: 0.9; letter-spacing: -2px; margin-bottom: 24px; margin-top: 20px; }
+    @media (min-width: 768px) { .hero-title { font-size: 82px; } }
+    .hero-desc { font-size: 18px; color: rgba(255,255,255,0.8); line-height: 1.6; margin-bottom: 40px; max-width: 480px; }
+    .btn-main { color: #000; background: var(--gold-400); padding: 18px 36px; font-weight: 600; font-size: 13px; letter-spacing: 1px; text-decoration: none; display: inline-block; transition: background-color 0.3s; text-transform: uppercase; }
+    .btn-main:hover { background: var(--gold-500); }
+
+    /* Animations Trigger Class */
+    .fade-up { opacity: 0; transform: translateY(40px); transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* Marquee */
+    .marquee-sec { padding: 32px 0; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(10,10,10,0.5); overflow: hidden; position: relative; }
+    .marquee-fade-left { position: absolute; top: 0; bottom: 0; left: 0; width: 128px; background: linear-gradient(to right, #050505, transparent); z-index: 10; }
+    .marquee-fade-right { position: absolute; top: 0; bottom: 0; right: 0; width: 128px; background: linear-gradient(to left, #050505, transparent); z-index: 10; }
+    .marquee-content { display: flex; width: max-content; animation: scroll 30s linear infinite; }
+    .marquee-item { display: flex; align-items: center; gap: 32px; padding: 0 32px; }
+    .marquee-text { font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.5); white-space: nowrap; text-transform: uppercase; }
+    @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* Shared Section Styling */
+    .section-spacing { padding: 96px 0; position: relative; scroll-margin-top: 96px; }
+    .section-title { font-size: 40px; font-weight: 300; line-height: 1.1; margin-bottom: 24px; letter-spacing: -1px; }
+    @media (min-width: 768px) { .section-title { font-size: 50px; } }
+    .section-desc { color: rgba(255,255,255,0.6); max-width: 480px; font-size: 18px; line-height: 1.6; }
+    .header-text-container { margin-bottom: 64px; }
+    @media (min-width: 768px) { .header-text-container { text-align: left; } .section-desc { margin: 0; } }
+    @media (max-width: 767px) { .header-text-container { text-align: center; } .section-desc { margin: 0 auto; } }
+
+    /* 3D Container & Cards */
+    .perspective-container { perspective: 1200px; transform-style: preserve-3d; }
+    .grid-4 { display: grid; grid-template-columns: 1fr; gap: 24px; }
+    @media (min-width: 768px) { .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+
+    .card-3d { background: #050505; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 40px; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); transform: rotateX(2deg) rotateY(-2deg) translateZ(0); box-shadow: -4px 4px 15px rgba(0, 0, 0, 0.2); position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .card-3d:hover { transform: rotateX(-2deg) rotateY(4deg) translateZ(30px); box-shadow: -15px 25px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(197, 160, 89, 0.1); border-color: rgba(197, 160, 89, 0.3) !important; background: #080808; z-index: 10; }
+    .card-3d-content { transform: translateZ(20px); transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 10; position: relative; }
+    .card-3d:hover .card-3d-content { transform: translateZ(40px); }
+
+    .card-large { grid-column: span 1; grid-row: span 1; min-height: 400px; justify-content: flex-end; overflow: hidden; padding: 40px; }
+    @media (min-width: 768px) { .card-large { grid-column: span 2; grid-row: span 2; min-height: 460px; } .card-wide { grid-column: span 2; } }
+    .card-large img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; transition: all 0.7s; filter: grayscale(40%); }
+    .card-large:hover img { opacity: 0.5; transform: scale(1.05) translateZ(-5px); }
+    .card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #050505, rgba(5,5,5,0.7), transparent); }
+
+    .card-tag { font-size: 10px; letter-spacing: 2px; font-weight: 600; margin-bottom: 12px; display: block; color: var(--gold-400); text-transform: uppercase; }
+    .card-title { font-size: 22px; margin-bottom: 12px; letter-spacing: -0.5px; }
+    .card-desc { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.5; max-width: 512px; }
+
+    /* Servicos Section */
+    .bg-dark-border { background-color: #050505; border-top: 1px solid rgba(255,255,255,0.05); }
+    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 24px; }
+    @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } }
+    .service-card { justify-content: center; }
+
+    /* Depoimentos */
+    .text-center-full { text-align: center; }
+    .mb-16 { margin-bottom: 64px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr; gap: 24px; }
+    @media (min-width: 768px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } }
+    .stars-row { display: flex; gap: 4px; margin-bottom: 24px; }
+    .stars-row svg { width: 12px; height: 12px; fill: var(--gold-400); color: var(--gold-400); }
+    .dep-text { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.6; flex-grow: 1; margin-bottom: 32px; font-style: italic; }
+    .dep-author { font-size: 12px; letter-spacing: 1px; font-weight: 600; text-transform: uppercase; color: #ffffff; }
+
+    /* CTA Section */
+    .cta-sec { padding: 128px 0; position: relative; overflow: hidden; text-align: center; background-color: #050505; border-top: 1px solid rgba(255,255,255,0.05); }
+    .cta-bg { position: absolute; inset: 0; width: 100%; height: 150%; object-fit: cover; opacity: 0.1; filter: grayscale(50%); transform-origin: top; transition: transform 0.1s linear;}
+    .cta-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #050505, rgba(5,5,5,0.8), #050505); }
+    .cta-content { max-width: 768px; margin: 0 auto; position: relative; z-index: 10; padding: 0 24px; }
+    .cta-title { font-size: 50px; font-weight: 300; line-height: 1; letter-spacing: -2px; margin-bottom: 32px; }
+    @media (min-width: 768px) { .cta-title { font-size: 64px; } }
+    .cta-desc { color: rgba(255,255,255,0.6); font-size: 18px; line-height: 1.6; margin-bottom: 48px; max-width: 576px; margin-left: auto; margin-right: auto; }
+
+    /* Localizacao Section */
+    .map-container { width: 100%; aspect-ratio: 4/3; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; overflow: hidden; position: relative; }
+    @media (min-width: 768px) { .map-container { aspect-ratio: 21/9; } }
+
+    /* Footer */
+    .footer { padding: 48px 0; border-top: 1px solid rgba(255,255,255,0.05); background-color: #050505; }
+    .footer .container { display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 16px; }
+    @media (min-width: 768px) { .footer .container { flex-direction: row; } }
+    .footer-logo { font-size: 16px; letter-spacing: 2px; color: rgba(255,255,255,0.5); text-transform: uppercase; font-family: var(--font-display); }
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
+
+    /* WhatsApp Floating Button */
+    .fab { position: fixed; bottom: 32px; right: 32px; z-index: 99; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; background-color: #25D366; color: white; border-radius: 50%; box-shadow: 0 10px 15px -3px rgba(37, 211, 102, 0.2); transition: transform 0.3s; text-decoration: none; }
+    .fab:hover { transform: scale(1.1); }
+    .fab-ripple { position: absolute; top: -4px; right: -4px; bottom: -4px; left: -4px; border-radius: 50%; border: 1px solid #25D366; animation: ripple 2s cubic-bezier(0, 0.2, 0.8, 1) infinite; }
+    @keyframes ripple { 0% { transform: scale(0.8); opacity: 1; border-width: 2px; } 100% { transform: scale(2.4); opacity: 0; border-width: 0px; } }
+    .fab svg { width: 32px; height: 32px; position: relative; z-index: 10; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Delay animations based on index for stagger effect */
+    .fade-up:nth-child(1) { transition-delay: 0.1s; }
+    .fade-up:nth-child(2) { transition-delay: 0.25s; }
+    .fade-up:nth-child(3) { transition-delay: 0.4s; }
+    .fade-up:nth-child(4) { transition-delay: 0.55s; }
+    .fade-up:nth-child(5) { transition-delay: 0.7s; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="container">
+      <div class="header-logo font-display">
+        PODÓLOGA <span class="text-gold">JOSI</span>
+      </div>
+      
+      <nav class="header-nav">
+        <button onclick="scrollToId('clinica')">A Clínica</button>
+        <button onclick="scrollToId('tratamentos')">Tratamentos</button>
+        <button onclick="scrollToId('localizacao')">Localização</button>
+      </nav>
+
+      <a 
+        href="https://wa.me/55041995699517" 
+        target="_blank"
+        rel="noopener noreferrer"
+        class="header-btn"
+      >
+        Agendar Consulta
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-bg" id="hero-bg"></div>
+      <div class="hero-overlay-1"></div>
+      <div class="hero-overlay-2"></div>
+      
+      <div class="hero-content container">
+        <div class="hero-inner">
+          <div class="fade-up">
+            <span class="hero-tag">Saúde &amp; Estética Avançada</span>
+          </div>
+          
+          <h1 class="hero-title font-display fade-up">
+            O toque que<br/>
+            transforma a saúde<br/>
+            <span class="text-gold italic">dos seus pés.</span>
+          </h1>
+          
+          <p class="hero-desc fade-up">
+            Podologia clínica e preventiva de luxo. Alívio imediato, cuidado humanizado e soluções indolores para recuperar o seu bem-estar, com a máxima delicadeza.
+          </p>
+          
+          <div class="fade-up">
+            <a 
+              href="https://wa.me/55041995699517" 
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-main"
+            >
+              Agende sua Avaliação
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee-sec">
+      <div class="marquee-fade-left"></div>
+      <div class="marquee-fade-right"></div>
+      <div class="marquee-content" id="marquee-content">
+        <!-- JS irá popular isso para ter o scroll infinito correto -->
+      </div>
+    </div>
+
+    <!-- DIFERENCIAIS -->
+    <section id="clinica" class="section-spacing">
+      <div class="container header-text-container">
+        <h2 class="section-title font-display">A excelência em <span class="text-gold">cada detalhe</span>.</h2>
+        <p class="section-desc">
+          Mais do que tratar, nosso propósito é cuidar. Oferecemos uma experiência segura, acolhedora e altamente especializada.
+        </p>
+      </div>
+
+      <div class="container perspective-container grid-4">
+        
+        <div class="card-large card-3d fade-up">
+          <img 
+            src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+            alt="Atendimento Humanizado" 
+          />
+          <div class="card-overlay"></div>
+          <div class="card-3d-content">
+            <span class="card-tag">01. Humanização</span>
+            <h3 class="card-title">Acolhimento &amp; Empatia</h3>
+            <p class="card-desc">
+              Um espaço seguro e inclusivo, acolhedor para a comunidade LGBTQ+. Temos orgulho da nossa forma carinhosa, paciente e respeitosa de atender idosos, pessoas acamadas e pacientes neurodivergentes.
+            </p>
+          </div>
+        </div>
+
+        <div class="card-3d fade-up">
+          <div class="card-3d-content">
+            <span class="card-tag">02. Resultados</span>
+            <h3 class="card-title">Mãos Leves</h3>
+            <p class="card-desc">Alívio imediato e procedimentos indolores, mesmo nos quadros agudos de infecção e inflamação.</p>
+          </div>
+        </div>
+
+        <div class="card-3d fade-up">
+          <div class="card-3d-content">
+            <span class="card-tag">03. Segurança</span>
+            <h3 class="card-title">Biossegurança</h3>
+            <p class="card-desc">Ambiente clínico impecável. Materiais rigorosamente esterilizados para garantir proteção total.</p>
+          </div>
+        </div>
+
+        <div class="card-wide card-3d fade-up">
+          <div class="card-3d-content">
+            <span class="card-tag">04. Pós-Consulta</span>
+            <h3 class="card-title">Cuidado que continua</h3>
+            <p class="card-desc">Acompanhamento pós-consulta via WhatsApp. Nossa preocupação com a sua evolução não acaba na clínica.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SERVIÇOS -->
+    <section id="tratamentos" class="section-spacing bg-dark-border">
+      <div class="container">
+        <div class="header-text-container">
+          <h2 class="section-title font-display">Nossos <span class="text-gold">Tratamentos</span></h2>
+          <p class="section-desc">
+            Soluções completas com total transparência. Explicamos todo o procedimento com calma, entregando exatamente o que você precisa, sem pressa.
+          </p>
+        </div>
+
+        <div class="perspective-container grid-2" id="services-grid">
+          <!-- JS irá inserir -->
+        </div>
+      </div>
+    </section>
+
+    <!-- DEPOIMENTOS -->
+    <section class="section-spacing">
+      <div class="container text-center-full mb-16">
+        <h2 class="section-title font-display" style="margin-bottom:0;">O que dizem os nossos <span class="text-gold">Pacientes</span></h2>
+      </div>
+      
+      <div class="container perspective-container grid-3" id="testimonials-grid">
+         <!-- JS irá inserir -->
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-sec" id="agendar">
+      <img 
+        src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
+        alt="Tratamento Relaxante" 
+        class="cta-bg"
+        id="cta-bg"
+      />
+      <div class="cta-overlay"></div>
+      
+      <div class="cta-content">
+        <div class="fade-up">
+          <span class="card-tag" style="text-align: center;">Agende Seu Horário</span>
+          <h2 class="cta-title font-display">Dê o primeiro passo <br/><span class="text-gold italic">sem dor.</span></h2>
+          <p class="cta-desc">
+            Recupere o seu bem-estar com uma especialista que entende e respeita o seu tempo, ouvindo suas necessidades com empatia.
+          </p>
+          <a 
+            href="https://wa.me/55041995699517"
+            target="_blank"
+            rel="noopener noreferrer" 
+            class="btn-main"
+          >
+            Agendar Via WhatsApp
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOCALIZAÇÃO -->
+    <section id="localizacao" class="section-spacing bg-dark-border">
+      <div class="container text-center-full mb-16">
+        <span class="card-tag">Como Chegar</span>
+        <h2 class="section-title font-display">Nossa <span class="text-gold">Localização</span></h2>
+        <p class="section-desc">Rua João Reffo, 1676 - Santa Felicidade, Curitiba - PR, 82410-000</p>
+      </div>
+      <div class="container">
+        <div class="map-container">
+          <iframe
+            src="https://maps.google.com/maps?q=Rua%20Jo%C3%A3o%20Reffo%2C%201676%20-%20Santa%20Felicidade%2C%20Curitiba%20-%20PR%2C%2082410-000&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            class="absolute inset-0 w-full h-full"
+            style="border: 0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">
+        PODÓLOGA <span class="text-gold">JOSI</span>
+      </div>
+      <p class="footer-copy">&copy; 2026 Podóloga Josi. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- WHATSAPP FAB -->
+  <a
+    href="https://wa.me/55041995699517"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="fab"
+  >
+    <div class="fab-ripple"></div>
+    <!-- Lucide MessageCircle SVG -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
+    </svg>
+  </a>
+
+  <!-- SCRIPTS -->
+  <script>
+    // 1. Navigation Scroll
+    function scrollToId(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // 2. Parallax Scrolling effects (Hero & CTA)
+    const heroBg = document.getElementById('hero-bg');
+    const ctaBg = document.getElementById('cta-bg');
+
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      if (heroBg) {
+        // limit to 50% max transform
+        const translateY = scrollY * 0.4; 
+        heroBg.style.transform = `translateY(${translateY}px)`;
+      }
+      if (ctaBg) {
+        // For CTA, relative to its position
+        const ctaRect = document.getElementById('agendar').getBoundingClientRect();
+        if (ctaRect.top < window.innerHeight && ctaRect.bottom > 0) {
+            const distance = window.innerHeight - ctaRect.top;
+            const translateY = distance * 0.2;
+            ctaBg.style.transform = `translateY(${translateY}px)`;
+        }
+      }
+    });
+
+    // 3. Intersection Observer for FadeUp Animations
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px 0px -50px 0px',
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-up').forEach(el => {
+      observer.observe(el);
+    });
+
+    // 4. Fill Marquee
+    const texts = [
+      "Atendimento Humanizado", "Alívio Imediato", "Protocolos Sem Dor", 
+      "Biossegurança Nível Cirúrgico", "Especialista em Casos Complexos",
+      "Atendimento Inclusivo"
+    ];
+    // repeat 3 times for smooth loop
+    const items = [...texts, ...texts, ...texts];
+    
+    // Lucide Star Icon SVG
+    const starSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gold" style="opacity:0.5;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+
+    const marqueeContent = document.getElementById('marquee-content');
+    if (marqueeContent) {
+      items.forEach(text => {
+        const div = document.createElement('div');
+        div.className = 'marquee-item';
+        div.innerHTML = `${starSvg} <span class="marquee-text">${text}</span>`;
+        marqueeContent.appendChild(div);
+      });
+    }
+
+    // 5. Fill Services
+    const services = [
+      {
+        title: "Unhas Infeccionadas",
+        desc: "Remoção e tratamento de unhas encravadas ou inflamadas de forma rápida e incrivelmente delicada, priorizando o conforto e alívio imediato da dor."
+      },
+      {
+        title: "Patologias Complexas",
+        desc: "Expertise no trato de granulomas avançados e condições clínicas crônicas que exigem conhecimento anatômico profundo e intervenção segura."
+      },
+      {
+        title: "Públicos Sensíveis",
+        desc: "Protocolos humanizados e adaptados com o tempo e a paciência necessários para idosos, pessoas acamadas (Parkinson/Alzheimer) e autistas."
+      },
+      {
+        title: "Limpeza & Estética",
+        desc: "Higienização profunda, corte técnico das unhas, remoção de calosidades e orientações preventivas para manter pés saudáveis e esteticamente belos."
+      }
+    ];
+
+    const servicesGrid = document.getElementById('services-grid');
+    if (servicesGrid) {
+      services.forEach((item, idx) => {
+        const num = String(idx + 1).padStart(2, '0');
+        const div = document.createElement('div');
+        div.className = 'service-card card-3d fade-up';
+        div.innerHTML = `
+          <div class="card-3d-content">
+            <span class="card-tag">Serviço ${num}</span>
+            <h3 class="card-title">${item.title}</h3>
+            <p class="card-desc">${item.desc}</p>
+          </div>
+        `;
+        servicesGrid.appendChild(div);
+        observer.observe(div);
+      });
+    }
+
+    // 6. Fill Testimonials
+    const depoimentos = [
+      {
+        text: "Eu estava morrendo de dor com minha unha encravada e com muito medo de mexer. A Josi tem mãos de fada! Não senti dor e saí pisando leve. Impressionante a delicadeza e segurança que ela passa.",
+        author: "Mariana Silva"
+      },
+      {
+        text: "Trouxe meu pai de 82 anos, que tem Alzheimer e deita com muita dificuldade. A paciência da Josi e a forma carinhosa como lidou com a situação não tem preço. Serviço impecável e ambiente brilhando.",
+        author: "Carlos Eduardo"
+      },
+      {
+        text: "Sempre tive muita vergonha de mostrar os pés. A Josi me acolheu, explicou tudo de forma didática, limpou com extremo cuidado num ambiente esterilizado que me deu paz. Recomendo de olhos fechados.",
+        author: "Fernanda T."
+      }
+    ];
+
+    const fillStarSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+
+    const testimonialsGrid = document.getElementById('testimonials-grid');
+    if (testimonialsGrid) {
+      depoimentos.forEach((dep) => {
+        const div = document.createElement('div');
+        div.className = 'card-3d fade-up';
+        div.innerHTML = `
+          <div class="card-3d-content" style="display:flex; flex-direction:column; height: 100%;">
+            <div class="stars-row">
+              ${fillStarSvg.repeat(5)}
+            </div>
+            <p class="dep-text">"${dep.text}"</p>
+            <p class="dep-author">— ${dep.author}</p>
+          </div>
+        `;
+        testimonialsGrid.appendChild(div);
+        observer.observe(div);
+      });
+    }
+
+  </script>
+</body>
 </html>
 
