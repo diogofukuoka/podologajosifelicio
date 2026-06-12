@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Podóloga Josi",
+  "description": "Landing page de luxo para Podologia Clínica e Preventiva, focada em alívio imediato e atendimento humanizado.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
